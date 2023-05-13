@@ -1,8 +1,11 @@
 const RabbitMQ = require("../services/RabbitMQ");
 
 const connectRabbitMq = async (req, res, next) => {
-  const channel = RabbitMQ.getChannel();
-  if (!channel) await RabbitMQ.connect();
+  console.log(`Connect mq server, trying...`);
+  const instance = RabbitMQ.getInstance();
+  console.log(`Instance`, instance);
+  const channel = instance.getChannel();
+  if (!channel) await instance.connect();
   next();
 };
 

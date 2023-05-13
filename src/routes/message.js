@@ -1,11 +1,12 @@
 const express = require("express");
 const Logger = require("../util/Logger");
-const route = express.Router;
-const logger = new Logger("Messaging");
-const { connectRabbitMq } = require("../util/Middlewares");
+const { connectRabbitMq } = require("../util/middlewares");
 const RabbitMQ = require("../services/RabbitMQ");
 const HTTP = require("../util/Http");
 const Constants = require("../util/Constants");
+
+const logger = new Logger("Messaging");
+const route = express.Router();
 
 const handleError = (res, err) => {
   logger.error(err);
@@ -15,12 +16,16 @@ const handleError = (res, err) => {
 route.post("/message", connectRabbitMq, async (req, res) => {
   logger.log("Message :", req.body);
   try {
-    const channel = RabbitMQ.getInstance().getChannel();
+    const instance = RabbitMQ.getInstance();
+    const channel = instance.getChannel();
+    logger.log(`Channel`, channel);
     await channel.assertQueue(Constants.QUEUE, { durable: false });
     const message = JSON.stringify({ message: req.body });
     await channel.sendToQueue(Constants.QUEUE, Buffer.from(message));
-    res.json({ message: "Done!" });
+    return res.json({ message: "Done!" });
   } catch (err) {
     return handleError(res, err);
   }
 });
+
+module.exports = route;

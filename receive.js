@@ -1,14 +1,20 @@
 const RabbitMQ = require("./src/services/RabbitMQ");
+const Constants = require("./src/util/Constants");
 
-if (!RabbitMQ.getChannel()) await RabbitMQ.connect();
+let channel = null;
 
-const channel = RabbitMQ.getChannel();
+(async () => {
+  const instance = RabbitMQ.getInstance();
+  if (!instance.getChannel()) await instance.connect();
 
-channel.consume(
-  queueName,
-  (msg) => {
-    const message = msg.content.toString();
-    console.log("Received message:", message);
-  },
-  { noAck: true }
-);
+  channel = instance.getChannel();
+
+  channel?.consume(
+    Constants.QUEUE,
+    (msg) => {
+      const message = msg.content.toString();
+      console.log("Received message:", message);
+    },
+    { noAck: true }
+  );
+})();
