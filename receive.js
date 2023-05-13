@@ -1,13 +1,12 @@
 const RabbitMQ = require("./src/services/RabbitMQ");
 const Constants = require("./src/util/Constants");
 
-let channel = null;
-
+//Consume messages from queue
 (async () => {
   const instance = RabbitMQ.getInstance();
   if (!instance.getChannel()) await instance.connect();
 
-  channel = instance.getChannel();
+  const channel = instance.getChannel();
 
   channel?.consume(
     Constants.QUEUE,

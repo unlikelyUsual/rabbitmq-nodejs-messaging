@@ -1,6 +1,7 @@
 const Logger = require("../util/Logger");
 const amqp = require("amqplib");
 
+//Singleton class for rabbit mq
 class RabbitMQ {
   _logger = new Logger("Rabbit MQ");
   _url = process.env.RABBIT_MQ_URL || "amqp://localhost";

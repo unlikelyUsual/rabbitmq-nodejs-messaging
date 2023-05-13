@@ -5,7 +5,7 @@ const RabbitMQ = require("../services/RabbitMQ");
 const HTTP = require("../util/Http");
 const Constants = require("../util/Constants");
 
-const logger = new Logger("Messaging");
+const logger = new Logger("Message Route");
 const route = express.Router();
 
 const handleError = (res, err) => {
