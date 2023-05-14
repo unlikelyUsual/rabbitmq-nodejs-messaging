@@ -5,6 +5,7 @@ const messageRoute = require("./routes/message");
 const Logger = require("./util/Logger");
 const RabbitMQ = require("./services/RabbitMQ");
 const { Worker } = require("worker_threads");
+const HTTP = require("./util/Http");
 
 const logger = new Logger("Index.Js: ");
 
@@ -40,6 +41,20 @@ worker.on("message", (messageFromWorker) => {
 
 worker.on("error", (error) => {
   logger.error("Worker error:", error);
+});
+
+app.use((req, res, next) => {
+  if (!res.data) {
+    return res.status(HTTP.NF).send({
+      status: false,
+      error: {
+        reason: "Invalid Endpoint",
+        code: 404,
+      },
+    });
+  }
+
+  res.status(res.statusCode || 200).send({ status: true, response: res.data });
 });
 
 const server = app.listen(PORT, () => logger.log(`Process started on port : ${PORT}`));
