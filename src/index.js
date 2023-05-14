@@ -4,8 +4,11 @@ const app = express();
 const messageRoute = require("./routes/message");
 const Logger = require("./util/Logger");
 const RabbitMQ = require("./services/RabbitMQ");
+const { Worker } = require("worker_threads");
 
-const logger = new Logger("Index JS");
+const logger = new Logger("Index.Js: ");
+
+app.use(express.json());
 
 app.use("/", messageRoute);
 
@@ -27,4 +30,16 @@ process.on("exit", closeServer);
 // Register the event handler for the SIGINT signal event (Ctrl+C)
 process.on("SIGINT", closeServer);
 
-const server = app.listen(PORT, () => console.log(`Process started on port : ${PORT}`));
+const worker = new Worker("./receive.js");
+
+worker.postMessage(`Start receiving message`);
+
+worker.on("message", (messageFromWorker) => {
+  logger.log("Received message from the web worker:", messageFromWorker);
+});
+
+worker.on("error", (error) => {
+  logger.error("Worker error:", error);
+});
+
+const server = app.listen(PORT, () => logger.log(`Process started on port : ${PORT}`));

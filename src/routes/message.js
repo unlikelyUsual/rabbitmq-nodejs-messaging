@@ -5,7 +5,7 @@ const RabbitMQ = require("../services/RabbitMQ");
 const HTTP = require("../util/Http");
 const Constants = require("../util/Constants");
 
-const logger = new Logger("Message Route");
+const logger = new Logger("Message_Route.js:");
 const route = express.Router();
 
 const handleError = (res, err) => {
@@ -18,7 +18,7 @@ route.post("/message", connectRabbitMq, async (req, res) => {
   try {
     const instance = RabbitMQ.getInstance();
     const channel = instance.getChannel();
-    logger.log(`Channel`, channel);
+    logger.log(`Is Channel : `, Boolean(channel));
     await channel.assertQueue(Constants.QUEUE, { durable: false });
     const message = JSON.stringify({ message: req.body });
     await channel.sendToQueue(Constants.QUEUE, Buffer.from(message));
